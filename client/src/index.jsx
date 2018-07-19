@@ -780,11 +780,11 @@ class App extends React.Component {
   render () {
     var division = ("ocd-division/country:us/state:" + this.state.state);
     return (
-      <div>
-        <h1>App v1</h1>
-        <form onSubmit={this.handleSubmit}>
+      <div style={styles.master}>
+        <h1 style={styles.headers}>App v1</h1>
+        <form style={styles.zip} onSubmit={this.handleSubmit}>
           <label>
-            Zip Code:<br></br>
+            ZipCode:<br></br>
             <input type="text" ref={el => this.element = el} />
           </label>
           <input type="submit" value="Submit" />
@@ -826,6 +826,30 @@ class ListView extends React.Component {
       </div>
     )
   }
+}
+
+
+const styles = {
+
+  master: {
+    alignContent: 'center',
+    'fontFamily': 'Verdana, Geneva, sans-serif'
+  },
+  headers: {
+    backgroundColor: 'red',
+    alignContent: 'center',
+    color: 'white',
+    margin: 0,
+    padding: 10
+  },
+  zip: {
+    display: 'block',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: 40,
+    paddingTop: 100
+  },
+
 }
 
 ReactDOM.render(<App/>, document.getElementById('app'));
