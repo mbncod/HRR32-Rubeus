@@ -811,6 +811,12 @@ class ListView extends React.Component {
   }
 
   render () {
+    // return this.state.map((data) => {
+    //   return (
+    //     <View><Text>{data.time}</Text></View>
+    //   )
+    // })
+
     return (
       <div>
         <p>{this.state.state}</p>
