@@ -7,6 +7,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      view: 'home',
       zip: '',
       state: 'tx',
       username: '',
@@ -87,6 +88,100 @@ class App extends React.Component {
           urls: [ 'http://www.glo.texas.gov/' ],
           title: 'Commissioner of General Land Office' } ]
     }
+  }
+
+  componentWillMount(){
+    axios.get('/checkuser')
+    .then(function (response) {
+      console.log(response);
+    })
+  }
+
+
+  changeView(option) {
+    this.setState({
+      view: option,
+    });
+  }
+
+  renderView() {
+    const {view} = this.state;
+    if (view === 'home') {
+      return <Home state={this.state}/>
+    } else if (view === 'dashboard'){
+      return <Dashboard state={this.state}/>
+    }
+  }
+
+  render () {
+    var division = ("ocd-division/country:us/state:" + this.state.state);
+    return (
+      <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand" href="#" onClick={() => this.changeView('home')}>APP V1</a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Townhall</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onClick={() => this.changeView('dashboard')}>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="auth/google">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        {this.renderView()}
+      </div>
+    )
+  }
+}
+
+class Dashboard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = this.props.state;
+  }
+
+  render (){
+    return(
+      <div>
+        <div class="col">
+          <div class="card mt-md-5 mt-sm-1">
+            <div class="card-body">
+              <h5 class="card-title">User Dashboard</h5>
+              <form class="form-horizontal">
+                <div class="row form-group-lg form-group">
+                  <label class="col-sm-4 col-md-3 control-label">Zip Code
+                  </label>
+                  <div class="col">
+                    <p class="mb-0">RETURN_ZIP_FROM_DB</p>
+                  </div>
+                </div>
+                <div class="row form-group-lg form-group">
+                  <label class="col-sm-4 col-md-3 control-label">Update Zip
+                  </label>
+                  <div class="col">
+                    <input type="text" name="last_name" value="" placeholder="enter new zip" id="zip" class="input-lg form-control">
+                    </input>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+class Home extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = this.props.state;
+
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.setUsername = this.setUsername.bind(this);
@@ -95,30 +190,10 @@ class App extends React.Component {
   }
 
 
-
   handleSubmit(event) {
     console.log('current state:', this.state.zip);
 
-    // var postCB = () => {
-    //   axios.post('/saveUser', {
-    //     zip: this.state.zip
-    //   })
-    //   .then(function (response) {
-    //   console.log(response);
-    //   })
-    // }
-
     event.preventDefault();
-    //this.setState({zip: this.element.value}, postCB);
-    // axios.get('/api', {
-    //   params: {
-    //     zip: this.state.zip
-    //   }
-    // })
-    // .then(function (response) {
-    //   console.log(response);
-    //   this.setState({ data: response })
-    // })
 
     axios.post('/saveUser', {
       zip: this.state.zip
@@ -162,25 +237,31 @@ class App extends React.Component {
   }
 
   render () {
-    var division = ("ocd-division/country:us/state:" + this.state.state);
     return (
-      <div style={styles.master}>
-        <h1 style={styles.headers}>App v1</h1>
-        <form style={styles.zip} onSubmit={this.handleSubmit}>
-          <label>
-            ZipCode:<br></br>
-            <input type="text" onChange={this.handleChange} ref={el => this.element = el} />
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
-        <input value={this.state.username} type="text" onChange={this.setUsername}/>
+    <div>
+      <div class="jumbotron">
+        <h1 class="display-4">Find your representatives</h1>
+        <p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+        <p class="lead">
+          <form onSubmit={this.handleSubmit}>
+            <label>
+              ZipCode:
+              <input type="text" onChange={this.handleChange} ref={el => this.element = el} />
+            </label>
+            <input type="submit" value="Submit" />
+          </form>
+        </p>
+      </div>
+        <input value={this.state.username} type="text" onChange={this.setUsername}></input>
           <br></br>
-        <input value={this.state.password} type="text" onChange={this.setPassword}/>
+        <input value={this.state.password} type="text" onChange={this.setPassword}></input>
           <br></br>
         <button onClick={this.handleLogin}>login</button>
         <p>{this.state.zip}</p>
-      <ListView data={this.state.data} state={this.state.state}/>
+      <div class="row">
+        <ListView data={this.state.data} state={this.state.state}/>
       </div>
+    </div>
     )
   }
 }
@@ -196,12 +277,15 @@ class ListView extends React.Component {
     var listOfReps = [];
     for (var i = 0; i < this.props.data.length; i++){
       listOfReps.push(
-        <div>
-          <p>{this.props.data[i].title}</p>
-          <p>{this.props.data[i].name}</p>
-          <p>{this.props.data[i].party}</p>
-          <br></br>
-          <br></br>
+        <div class="col-sm-12 col-md-3 my-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{this.props.data[i].name}</h5>
+                    <p class="lead">{this.props.data[i].title}</p>
+                    <p class="card-text">{this.props.data[i].party}</p>
+                    <a href="#" class="card-link">link</a>
+                </div>
+            </div>
         </div>
       )
     }
@@ -210,46 +294,5 @@ class ListView extends React.Component {
 }
 
 
-const styles = {
-
-  master: {
-    alignContent: 'center',
-    'fontFamily': 'Verdana, Geneva, sans-serif'
-  },
-  headers: {
-    backgroundColor: 'red',
-    alignContent: 'center',
-    color: 'white',
-    margin: 0,
-    padding: 10
-  },
-  zip: {
-    display: 'block',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    width: 40,
-    paddingTop: 100
-  },
-
-}
 
 ReactDOM.render(<App/>, document.getElementById('app'));
-
-//   render () {
-//     var division = ("ocd-division/country:us/state:" + this.state.state);
-//     return (
-//       <div style={styles.master}>
-//         <h1 style={styles.headers}>App v1</h1>
-//         <form style={styles.zip} onSubmit={this.handleSubmit}>
-//           <label>
-//             ZipCode:<br></br>
-//             <input type="text" ref={el => this.element = el} />
-//           </label>
-//           <input type="submit" value="Submit" />
-//         </form>
-//         <p>{this.state.zip}</p>
-//       <ListView data={this.state.data} state={this.state.state}/>
-//       </div>
-//     )
-//   }
-// }

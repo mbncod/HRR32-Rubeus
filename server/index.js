@@ -102,7 +102,12 @@ app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     console.log('hello you submitted!');
-    res.send('you are now logged in');
+    //res.send('you are now logged in');
     console.log(req.user);
-    //res.redirect('/');
+    res.redirect('/');
   });
+
+app.get('/checkuser', function(req, res){
+  res.send(req.user);
+  console.log("hello");
+});
